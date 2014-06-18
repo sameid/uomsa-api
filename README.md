@@ -25,6 +25,12 @@ npm install
 node server.js
 ```
 
+### Functionality
+
+- CRUD functions for Events
+- CRUD functions for Users
+
+Look at Issues to see what's left.
 
 
 
