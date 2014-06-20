@@ -1,17 +1,56 @@
 var Environment = require('./config').ENVIRONMENT;
+
 var express	= require('express');
+
+//Express Middleware
+var session = require('express-session');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+
+//Express
 var app	= express();
 
+//Passport Session Libs
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var RedisStore = require('connect-redis')(session);
+
+//Middleware Instantiation
 app.use(bodyParser());
+app.use(cookieParser());
+app.use(session({
+    store: new RedisStore({
+        host: Environment.redis.host, 
+        port: Environment.redis.port
+    ***REMOVED***),
+    secret: 'd4t4b4s3',
+    cookie: {
+    	httpOnly: false
+    ***REMOVED***
+***REMOVED***));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 var port = process.env.PORT || 8080; // set our port
 
+//DB Specific Handling
 var mongoose = require('mongoose');
-mongoose.connect(Environment.mongo.connectString); // connect to our database
-
 var eventHandler = require('./models/event');
 var userHandler = require('./models/user');
+var connection = mongoose.connect(Environment.mongo.connectString); // connect to our database
+
+//Passport Specific stuff
+passport.use(new LocalStrategy(userHandler.authenticate));
+passport.serializeUser(userHandler.serialize);
+passport.deserializeUser(userHandler.deserialize);
+
+var auth = function (req, res, next) {
+  if (req.isAuthenticated()) { next(); ***REMOVED***
+  else {
+    res.redirect('/#login');
+  ***REMOVED***
+***REMOVED***
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -30,29 +69,31 @@ router.get('/', function(req, res) {
 // on routes that end in /events
 // ----------------------------------------------------
 router.route('/events')
-	.post(eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
-	.get(eventHandler.readAllEvents)// get all the events (accessed at GET http://localhost:8080/api/events)
+	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
+	.get(auth, eventHandler.readAllEvents)// get all the events (accessed at GET http://localhost:8080/api/events)
 
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
 router.route('/events/:event_id')
-	.get(eventHandler.readEvent)// get the event with that id
-	.put(eventHandler.updateEvent)// update the event with this id
-	.delete(eventHandler.deleteEvent);// delete the event with this id
+	.get(auth, eventHandler.readEvent)// get the event with that id
+	.put(auth, eventHandler.updateEvent)// update the event with this id
+	.delete(auth, eventHandler.deleteEvent);// delete the event with this id
 	
 //
 // on routes that end in /users
 // ----------------------------------------------------
+router.route('/login')
+	.post(passport.authenticate('local', { successRedirect: '/', failureRedirect: '/poop'***REMOVED***))
+
 router.route('/users')
-	.post(userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
+	.post(auth, userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
 
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
 router.route('/users/:user_id')
-	.get(userHandler.readUser)// get the event with that id
-	.put(userHandler.updateUser)// update the event with this id
-	.delete(userHandler.deleteUser);	// delete the event with this id
-
+	.get(auth, userHandler.readUser)// get the event with that id
+	.put(auth, userHandler.updateUser)// update the event with this id
+	.delete(auth,userHandler.deleteUser);	// delete the event with this id
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/api', router);
@@ -60,4 +101,4 @@ app.use('/api', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-console.log('uoMSA RESTAPI running on port ' + port);
+console.log('uomsa-api running on ' + port);

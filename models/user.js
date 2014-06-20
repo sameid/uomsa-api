@@ -1,19 +1,30 @@
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 
+var crypto = require('crypto');
+
 var UserSchema   = new Schema({
+	hash: String,
 	firstname: String,
 	lastname: String,
-	username: String,
 	password: String, 
-	email: String
+	email: String,
+	studentNumber: Number
 ***REMOVED***);
 
 var UserModel = mongoose.model('User', UserSchema);
 
+exports.schema = UserSchema;
+
 exports.createUser = function(req, res) {
 	var userInstance = new UserModel();		// create a new instance of the member model
-	userInstance.name = req.body.name;  // set the members name (comes from the request)
+	userInstance.hash = crypto.createHash('md5').update(req.body.studentNumber + (new Date).toString()).digest("hex");
+	userInstance.firstname = req.body.firstname;  // set the members name (comes from the request)
+	userInstance.lastname = req.body.lastname;
+	userInstance.password = crypto.createHash('md5').update(req.body.password).digest("hex");
+	userInstance.email = req.body.email;
+	userInstance.studentNumber = req.body.studentNumber;
+
 	userInstance.save(function(err) {
 		if (err)
 			res.send(err);
@@ -23,7 +34,7 @@ exports.createUser = function(req, res) {
 ***REMOVED***
 
 exports.readUser = function(req, res) {
-	UserModel.findById(req.params.user_id, function(err, user) {
+	UserModel.findOne({hash: req.params.user_id***REMOVED***, function(err, user) {
 		if (err)
 			res.send(err);
 		res.json(user);
@@ -31,10 +42,12 @@ exports.readUser = function(req, res) {
 ***REMOVED***
 
 exports.updateUser = function(req, res) {
-	UserModel.findById(req.params.user_id, function(err, user) {
+	UserModel.findOne({hash: req.params.hash***REMOVED***, function(err, user) {
 		if (err)
 			res.send(err);
-
+		/*
+		* Add more user attributes when updating	
+		*/
 		user.name = req.body.name;
 		user.save(function(err) {
 			if (err)
@@ -47,7 +60,7 @@ exports.updateUser = function(req, res) {
 
 exports.deleteUser = function(req, res) {
 	UserModel.remove({
-		_id: req.params.event_id
+		hash: req.params.hash
 ***REMOVED*** function(err, user) {
 		if (err)
 			res.send(err);
@@ -55,3 +68,29 @@ exports.deleteUser = function(req, res) {
 		res.json({ message: 'Successfully deleted user' ***REMOVED***);
 ***REMOVED***);
 ***REMOVED***
+
+exports.authenticate = function (email, password, done){
+    pass = crypto.createHash('md5').update(password).digest("hex");
+
+    UserModel.findOne({'email':email***REMOVED***, function (err, item){
+    	if (err) return done(err);
+    	else if (item){
+    		if (pass == item.password){
+    			return done (null, item);
+    	***REMOVED***
+    		else done (null, false, {message: 'Incorrect Password'***REMOVED***);
+    ***REMOVED***
+    	else return done(null, false, {message:'Incorrect Username'***REMOVED***);
+    ***REMOVED***);
+***REMOVED***;
+
+exports.serialize = function (user, done){
+    done (null, user.hash);
+***REMOVED***;
+
+exports.deserialize = function (hash, done){
+
+	UserModel.findOne({'hash': hash***REMOVED***, function (err, item){
+		done(err, item);
+***REMOVED***);
+***REMOVED***;
