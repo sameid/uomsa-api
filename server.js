@@ -38,7 +38,11 @@ var port = process.env.PORT || 8080; // set our port
 var mongoose = require('mongoose');
 var eventHandler = require('./models/event');
 var userHandler = require('./models/user');
-var connection = mongoose.connect(Environment.mongo.connectString); // connect to our database
+
+var connection = mongoose.connect(Environment.mongo.connectString, function(err){
+	if (err) console.log(err);
+***REMOVED***); // connect to our database
+
 
 //Passport Specific stuff
 passport.use(new LocalStrategy(userHandler.authenticate));
@@ -71,7 +75,8 @@ router.get('/', function(req, res) {
 router.route('/events')
 	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
 	.get(auth, eventHandler.readAllEvents)// get all the events (accessed at GET http://localhost:8080/api/events)
-
+	.get(eventHandler.findAllUpcoming)
+	
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
 router.route('/events/:event_id')
@@ -85,10 +90,15 @@ router.route('/events/:event_id')
 router.route('/login')
 	.post(passport.authenticate('local', { successRedirect: '/', failureRedirect: '/poop'***REMOVED***))
 
+router.route('/loginFailed')
+	.get(function (req, res){
+		res.json({error:"could not login"***REMOVED***);
+***REMOVED***);
+
 router.route('/users')
 	.post(auth, userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
 
-// on routes that end in /events/:event_id
+// on routes that end in /users/:user_id
 // ----------------------------------------------------
 router.route('/users/:user_id')
 	.get(auth, userHandler.readUser)// get the event with that id
