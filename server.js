@@ -75,7 +75,7 @@ router.get('/', function(req, res) {
 router.route('/events')
 	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
 	.get(auth, eventHandler.readAllEvents)// get all the events (accessed at GET http://localhost:8080/api/events)
-	.get(eventHandler.findAllUpcoming)
+	// .get(eventHandler.findAllUpcoming)
 	
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
