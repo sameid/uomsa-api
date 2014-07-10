@@ -6,6 +6,8 @@ var express	= require('express');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var morgan = require('morgan');
+var cors = require('cors');
 
 //Express
 var app	= express();
@@ -18,6 +20,8 @@ var RedisStore = require('connect-redis')(session);
 //Middleware Instantiation
 app.use(bodyParser());
 app.use(cookieParser());
+app.use(morgan('tiny'));
+app.use(cors());
 app.use(session({
     store: new RedisStore({
         host: Environment.redis.host, 
@@ -52,7 +56,7 @@ passport.deserializeUser(userHandler.deserialize);
 var auth = function (req, res, next) {
   if (req.isAuthenticated()) { next(); ***REMOVED***
   else {
-    res.redirect('/#login');
+  	res.send("Your request was not authenticated, please login.");
   ***REMOVED***
 ***REMOVED***
 
@@ -74,7 +78,7 @@ router.get('/', function(req, res) {
 // ----------------------------------------------------
 router.route('/events')
 	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
-	.get(auth, eventHandler.readAllEvents)// get all the events (accessed at GET http://localhost:8080/api/events)
+	.get(auth, eventHandler.readAllEvents);// get all the events (accessed at GET http://localhost:8080/api/events)
 	// .get(eventHandler.findAllUpcoming)
 	
 // on routes that end in /events/:event_id
@@ -88,12 +92,20 @@ router.route('/events/:event_id')
 // on routes that end in /users
 // ----------------------------------------------------
 router.route('/login')
-	.post(passport.authenticate('local', { successRedirect: '/', failureRedirect: '/poop'***REMOVED***))
+	.post(function (req, res){
+		passport.authenticate('local', function (err, user, info){
+			if (err) return res.json(err);
+			if (!user) return res.json(info);
 
-router.route('/loginFailed')
-	.get(function (req, res){
-		res.json({error:"could not login"***REMOVED***);
+			req.login(user, function (err){
+				console.log(err)
+				if (err) return res.json(err);
+				return res.json(user);
+		***REMOVED***);
+
+	***REMOVED***)(req, res);
 ***REMOVED***);
+
 
 router.route('/users')
 	.post(auth, userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)

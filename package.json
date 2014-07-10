@@ -6,9 +6,11 @@
 		"mongoose": "~3.6.13",
 		"body-parser": "~1.0.1",
 		"cookie-parser":"*",
+		"morgan":"*",
 		"passport": "*",
 		"passport-local": "*",
 		"connect-redis": "*",
-		"express-session": "*"
+		"express-session": "*",
+		"cors":"*"
 ***REMOVED***
 ***REMOVED***

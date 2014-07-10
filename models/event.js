@@ -12,7 +12,10 @@ var EventSchema   = new Schema({
 		longitude: Number,
 		latitude: Number
 ***REMOVED***
-	date: Date,
+	created: {
+		type:Date, 
+		default: Date.now
+***REMOVED***
 	usersAttending : Array,
 	images: Array,
 	mainImg: { data: Buffer, contentType: String ***REMOVED***
@@ -45,13 +48,14 @@ exports.createEvent = function(req, res) {
 
 exports.readAllEvents = function(req, res) {
 	EventModel.find(function(err, events) {
-		if (err)
-			res.send(err);
+		if (err)res.send(err);
+
 		res.json(events);
 ***REMOVED***);
 ***REMOVED***
 
 exports.readEvent = function(req, res) {
+	console.log('test');
 	EventModel.findOne({'hash':req.params.event_id***REMOVED***, function(err, eventInstance) {
 		if (err)
 			res.send(err);

@@ -72,20 +72,26 @@ exports.deleteUser = function(req, res) {
 exports.authenticate = function (email, password, done){
     pass = crypto.createHash('md5').update(password).digest("hex");
 
-    UserModel.findOne({'email':email***REMOVED***, function (err, item){
+    UserModel.findOne({'email':email***REMOVED***,function (err, item){
     	if (err) return done(err);
     	else if (item){
     		if (pass == item.password){
-    			return done (null, item);
+    			return done (null, {user: {
+                    firstname: item.firstname,
+                    lastname: item.lastname,
+                    email: item.email,
+                    hash: item.hash,
+                    studentid: item.studentNumber
+                ***REMOVED***, message:"Successfully signed in", success:true***REMOVED***);
     	***REMOVED***
-    		else done (null, false, {message: 'Incorrect Password'***REMOVED***);
+    		else done (null, false, {message: 'Incorrect Password', success:false ***REMOVED***);
     ***REMOVED***
-    	else return done(null, false, {message:'Incorrect Username'***REMOVED***);
+    	else return done(null, false, {message:'Incorrect Username', success:false ***REMOVED***);
     ***REMOVED***);
 ***REMOVED***;
 
 exports.serialize = function (user, done){
-    done (null, user.hash);
+    done (null, user.user.hash);
 ***REMOVED***;
 
 exports.deserialize = function (hash, done){
