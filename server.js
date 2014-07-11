@@ -106,6 +106,12 @@ router.route('/login')
 	***REMOVED***)(req, res);
 ***REMOVED***);
 
+router.route('/logout')
+	.get(function (req,res){
+		req.logout();
+		res.json({success:true***REMOVED***);
+***REMOVED***)
+
 
 router.route('/users')
 	.post(auth, userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
