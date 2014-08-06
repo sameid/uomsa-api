@@ -1,4 +1,4 @@
-
+var fs 			 = require('fs');
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 var crypto = require('crypto');
@@ -16,9 +16,14 @@ var EventSchema   = new Schema({
 		type:Date, 
 		default: Date.now
 ***REMOVED***
+	date: Date,
+	startTime: String,
+	endTime: String,
 	usersAttending : Array,
-	images: Array,
-	mainImg: { data: Buffer, contentType: String ***REMOVED***
+	poster: {
+		data: Buffer,
+		contentType: String
+***REMOVED***
 ***REMOVED***);
 
 
@@ -33,17 +38,43 @@ exports.createEvent = function(req, res) {
 	eventInstance.description = req.body.description;
 	eventInstance.address = req.body.address;
 	//calculate longitude and latitude
-	date = req.body.date;
-	images = req.body.images;
-	mainImg = req.body.mainImg;
 
-	eventInstance.save(function(err) {
+	eventInstance.date = req.body.date;
+	eventInstance.startTime = req.body.start;
+	eventInstance.endTime = req.body.end;
+
+	eventInstance.poster.data = fs.readFileSync(req.files.poster.path);
+	eventInstance.poster.contentType = req.files.poster.mimetype;
+
+	// res.json(eventInstance);
+
+	eventInstance.save(function(err){
 		if (err)
 			res.send(err);
 
-		res.json({ message: 'Event created!' ***REMOVED***);
+		res.json({
+			message: 'Event Successfully Created!'
+	***REMOVED***)
 ***REMOVED***);
+***REMOVED***
 
+exports.findAllUpcoming = function (req, res){
+	EventModel
+		.find()
+	 	.where('date').gt(new Date())
+		.select("hash title description address date startTime endTime created usersAttending")
+		.exec(function (err, events){
+			if (err)res.send(err);
+			res.json({data:events, success:true***REMOVED***);
+	***REMOVED***);
+***REMOVED***
+
+exports.findPoster = function (req,res){
+	EventModel.findOne({'hash':req.params.event_id***REMOVED***, function (err, eventInstance) {
+        if (err) return next(err);
+        res.contentType(eventInstance.poster.contentType);
+        res.send(eventInstance.poster.data);
+    ***REMOVED***);
 ***REMOVED***
 
 exports.readAllEvents = function(req, res) {
@@ -59,7 +90,8 @@ exports.readEvent = function(req, res) {
 	EventModel.findOne({'hash':req.params.event_id***REMOVED***, function(err, eventInstance) {
 		if (err)
 			res.send(err);
-		res.json(eventInstance);
+		eventInstance.poster = {***REMOVED***;
+		res.json({data:eventInstance, success:true***REMOVED***);
 ***REMOVED***);
 ***REMOVED***
 

@@ -26,10 +26,13 @@ exports.createUser = function(req, res) {
 	userInstance.studentNumber = req.body.studentNumber;
 
 	userInstance.save(function(err) {
-		if (err)
-			res.send(err);
-
-		res.json({ message: 'user created!' ***REMOVED***);
+		if (err){
+			res.json({
+				message: err,
+				success: false
+		***REMOVED***);
+	***REMOVED***
+		res.json({ message: 'user created!', success:true , user:userInstance ***REMOVED***);
 ***REMOVED***);
 ***REMOVED***
 

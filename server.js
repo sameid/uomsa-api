@@ -5,6 +5,7 @@ var express	= require('express');
 //Express Middleware
 var session = require('express-session');
 var bodyParser = require('body-parser');
+var multer = require('multer');
 var cookieParser = require('cookie-parser');
 var morgan = require('morgan');
 var cors = require('cors');
@@ -18,6 +19,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var RedisStore = require('connect-redis')(session);
 
 //Middleware Instantiation
+app.use(multer({uploadDir:'./uploads'***REMOVED***));
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(morgan('tiny'));
@@ -79,12 +81,18 @@ router.get('/', function(req, res) {
 router.route('/events')
 	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
 	.get(auth, eventHandler.readAllEvents);// get all the events (accessed at GET http://localhost:8080/api/events)
-	// .get(eventHandler.findAllUpcoming)
+	
+
+router.route('/events/upcoming')
+	.get(eventHandler.findAllUpcoming);
+
+router.route('/events/poster/:event_id')
+	.get(eventHandler.findPoster);
 	
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
 router.route('/events/:event_id')
-	.get(auth, eventHandler.readEvent)// get the event with that id
+	.get(eventHandler.readEvent)// get the event with that id
 	.put(auth, eventHandler.updateEvent)// update the event with this id
 	.delete(auth, eventHandler.deleteEvent);// delete the event with this id
 	
@@ -114,7 +122,7 @@ router.route('/logout')
 
 
 router.route('/users')
-	.post(auth, userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
+	.post(userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
 
 // on routes that end in /users/:user_id
 // ----------------------------------------------------
