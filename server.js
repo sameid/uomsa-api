@@ -79,15 +79,19 @@ router.get('/', function(req, res) {
 // on routes that end in /events
 // ----------------------------------------------------
 router.route('/events')
-	.post(auth, eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events)
+	.post(eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events) -- remember to change back to authenticated.
 	.get(auth, eventHandler.readAllEvents);// get all the events (accessed at GET http://localhost:8080/api/events)
 	
 
 router.route('/events/upcoming')
 	.get(eventHandler.findAllUpcoming);
 
+router.route('/events/status')
+	.post(eventHandler.status)
+	.get(eventHandler.status_get);
+
 router.route('/events/poster/:event_id')
-	.get(eventHandler.findPoster);
+	.get(eventHandler.poster);
 	
 // on routes that end in /events/:event_id
 // ----------------------------------------------------
