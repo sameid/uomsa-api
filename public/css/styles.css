@@ -1,0 +1,37 @@
+body {
+    /*font-family: source-sans-pro, sans-serif;*/
+    /*font-size: 15px;*/
+    /*padding-top: 60px;*/
+    /*padding-bottom: 40px;*/
+***REMOVED***
+
+.dropdown-menu {
+    max-height: 400px;
+    overflow: auto;
+    width: 230px;
+***REMOVED***
+
+.list-item {
+    padding-top: 6px;
+    padding-left: 56px;
+***REMOVED***
+
+.no-reports {
+    display: none;
+***REMOVED***
+
+.poster {
+    height: 255px;
+    width: 175px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #999;
+***REMOVED***
+
+/*.event-list .event-item img {
+    display: block;
+    height: 255px;
+    width: 100%;
+    overflow: hidden;
+***REMOVED***
+*/

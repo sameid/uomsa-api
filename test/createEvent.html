@@ -1,7 +1,12 @@
 <html>
+<head>
+
+	<script type="text/javascript" src="digestAuthRequest.js"></script>
+</head>
+
 <body>
 
-<form method="post" enctype="multipart/form-data" action="http://localhost:8080/api/events">
+<form method="post" enctype="multipart/form-data" action="http://localhost:3000/api/event">
 	Title: <input type="text" name="title"><br>
     Description <input type="text" name="description"><br>
     Date <input type="date" name="date"><br>
@@ -10,6 +15,7 @@
     Address<input type="text" name="address"><br>
     Poster <input type="file" name="poster"><br>
     <input type="submit"><br>
-</form>
+</form> 
+
 </body>
 </html>

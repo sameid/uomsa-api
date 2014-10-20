@@ -18,9 +18,12 @@
 		"passport": "0.2.0",
 		"passport-local": "1.0.0",
 		"connect-redis": "2.0.0",
+		"passport-http": "*",
 		"express-session": "1.7.6",
 		"cors": "2.4.1",
 		"string": "1.9.1",
-		"multer": "0.1.4"
+		"multer": "0.1.4",
+		"node-gcm-service": "*",
+		"underscore": "*"
 ***REMOVED***
 ***REMOVED***

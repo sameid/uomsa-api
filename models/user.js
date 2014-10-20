@@ -1,7 +1,13 @@
+var _e = require('../config').ENVIRONMENT;
+console.log(_e);
+
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
-
 var crypto = require('crypto');
+var _ = require('underscore');
+var r = require('redis');
+var redis = r.createClient(_e.redis.port, _e.redis.host, {auth_pass: _e.redis.pass***REMOVED*** );
+var uuid = require('node-uuid');
 
 var UserSchema   = new Schema({
 	hash: String,
@@ -9,7 +15,10 @@ var UserSchema   = new Schema({
 	lastname: String,
 	password: String, 
 	email: String,
-	studentNumber: Number
+	studentNumber: Number,
+	key: String,
+	going: [ { type: Schema.Types.ObjectId, ref: 'Event' ***REMOVED*** ],
+	maybe: [ { type: Schema.Types.ObjectId, ref: 'Event' ***REMOVED*** ]
 ***REMOVED***);
 
 var UserModel = mongoose.model('User', UserSchema);
@@ -36,6 +45,24 @@ exports.createUser = function(req, res) {
 ***REMOVED***);
 ***REMOVED***
 
+exports.f = function(req, res){
+	
+***REMOVED***
+
+exports.findMe = function(req,res){
+	console.log(req.body);
+	UserModel.findOne({email: req.body.email***REMOVED***, function(err, user) {
+		if (err) res.json({message:err, success:false***REMOVED***);
+		
+		if (user && user.password === crypto.createHash('md5').update(req.body.password).digest("hex")){
+			res.json({user: user, message:'Found User', success:false***REMOVED***);
+	***REMOVED***
+		else {
+			res.json({message: 'Permission Denied', success:false***REMOVED***);
+	***REMOVED***
+***REMOVED***);
+***REMOVED***
+
 exports.readUser = function(req, res) {
 	UserModel.findOne({hash: req.params.user_id***REMOVED***, function(err, user) {
 		if (err)
@@ -45,61 +72,122 @@ exports.readUser = function(req, res) {
 ***REMOVED***
 
 exports.updateUser = function(req, res) {
-	UserModel.findOne({hash: req.params.hash***REMOVED***, function(err, user) {
-		if (err)
-			res.send(err);
-		/*
-		* Add more user attributes when updating	
-		*/
-		user.name = req.body.name;
-		user.save(function(err) {
-			if (err)
-				res.send(err);
 
-			res.json({ message: 'user updated!' ***REMOVED***);
-	***REMOVED***);
+	UserModel.findOne({hash: req.params.user_id***REMOVED***, function(err, user) {
+		if (err) res.json({message:err, success:false***REMOVED***);
+		if (user.password === crypto.createHash('md5').update(req.body.password).digest("hex")){
+			if (req.body.firstname) user.firstname = req.body.firstname;
+			if (req.body.lastname)user.lastname = req.body.lastname;
+			if (req.body.studentNumber)user.studentNumber = req.body.studentNumber;
+			if (req.body.email)user.email = req.body.email;
+			
+			user.save(function(err) {
+				if (err) res.json({message:err, success:false***REMOVED***);
+				res.json({ message: 'user updated!', success:true ***REMOVED***);
+		***REMOVED***);
+	***REMOVED***
+		else {
+			res.json({message: 'Permission Denied', success:false***REMOVED***);
+	***REMOVED***
+		
 ***REMOVED***);
 ***REMOVED***
 
 exports.deleteUser = function(req, res) {
-	UserModel.remove({
-		hash: req.params.hash
-***REMOVED*** function(err, user) {
-		if (err)
-			res.send(err);
+	if (_.contains(keys, req.body.key)){
+		UserModel.remove({
+			hash: req.params.hash
+	***REMOVED*** function(err, user) {
+			if (err)
+				res.send(err);
 
-		res.json({ message: 'Successfully deleted user' ***REMOVED***);
+			res.json({ message: 'Successfully deleted user' ***REMOVED***);
+	***REMOVED***);	
+***REMOVED***
+	else {
+		res.json({message: "Permission Denied", success:false***REMOVED***);
+***REMOVED***
+***REMOVED***
+
+exports.changePassword = function(req, res){
+	UserModel.findOne({hash: req.params.hash***REMOVED***, function(err, user){
+		if (err) res.json({message:err, success:false***REMOVED***);
+		if (user.password === crypto.createHash('md5').update(req.body.confirm_password).digest('hex')){
+			user.password = crypto.createHash('md5').update(req.body.new_password).digest('hex');
+			user.save(function(err){
+				if(err) return res.json({message:err, success:false***REMOVED***);
+				res.json({message:'Password changed successfully', success:true***REMOVED***);
+		***REMOVED***);	
+	***REMOVED***
+		else {
+			res.json({message: "Permission Denied", success:false***REMOVED***);		
+	***REMOVED***
 ***REMOVED***);
 ***REMOVED***
 
-exports.authenticate = function (email, password, done){
-    pass = crypto.createHash('md5').update(password).digest("hex");
+// exports.authenticate = function (email, password, done){
+//     pass = crypto.createHash('md5').update(password).digest("hex");
 
-    UserModel.findOne({'email':email***REMOVED***,function (err, item){
-    	if (err) return done(err);
-    	else if (item){
-    		if (pass == item.password){
-    			return done (null, {user: {
-                    firstname: item.firstname,
-                    lastname: item.lastname,
-                    email: item.email,
-                    hash: item.hash,
-                    studentid: item.studentNumber
-                ***REMOVED***, message:"Successfully signed in", success:true***REMOVED***);
-    	***REMOVED***
-    		else done (null, false, {message: 'Incorrect Password', success:false ***REMOVED***);
-    ***REMOVED***
-    	else return done(null, false, {message:'Incorrect Username', success:false ***REMOVED***);
-    ***REMOVED***);
-***REMOVED***;
+//     UserModel.findOne({'email':email***REMOVED***,function (err, item){
+//     	if (err) return done(err);
+//     	else if (item){
+//     		if (pass == item.password){
+//     			return done (null, {user: {
+//                     firstname: item.firstname,
+//                     lastname: item.lastname,
+//                     email: item.email,
+//                     hash: item.hash,
+//                     studentid: item.studentNumber,
+//                     key:item.key
+//                 ***REMOVED***, message:"Successfully signed in", success:true***REMOVED***);
+//     	***REMOVED***
+//     		else done (null, false, {message: 'Incorrect Password', success:false ***REMOVED***);
+//     ***REMOVED***
+//     	else return done(null, false, {message:'Incorrect Username', success:false ***REMOVED***);
+//     ***REMOVED***);
+// ***REMOVED***;
 
-exports.serialize = function (user, done){
-    done (null, user.user.hash);
-***REMOVED***;
+exports.accessToken = function(req, res){
+	var username = req.body.email;
+	var password = crypto.createHash('md5').update(req.body.password).digest("hex");
+	var apikey = req.body.api_key;
 
-exports.deserialize = function (hash, done){
-
-	UserModel.findOne({'hash': hash***REMOVED***, function (err, item){
-		done(err, item);
+	redis.sismember ('api-keys', apikey, function(err, exists){
+		if (exists){
+			UserModel.findOne({'email':username***REMOVED***,function (err, item){
+				if (err) return res.json(err);
+				else if (item){
+					if (password == item.password){
+						//api key is legit, username and password checkout, create an access token in redis...
+						var access_token = uuid.v1();
+						redis.sadd('access-tokens', access_token);
+						return res.json ({user: {
+							firstname: item.firstname,
+							lastname: item.lastname,
+							email: item.email,
+							hash: item.hash,
+							studentid: item.studentNumber,
+							access_token: access_token
+					***REMOVED*** message: "Successfully created access token.", success:true***REMOVED***);
+				***REMOVED***
+					else res.json ({message: 'Incorrect Password', success:false ***REMOVED***);
+			***REMOVED***
+				else return res.json ({message:'Incorrect Username', success:false ***REMOVED***);
+		***REMOVED***);
+	***REMOVED***
+		else {
+			res.json({message:'Invalid Api Key', success:false***REMOVED***);
+	***REMOVED***
 ***REMOVED***);
-***REMOVED***;
+***REMOVED***
+
+// exports.serialize = function (user, done){
+//     done (null, user.user.hash);
+// ***REMOVED***;
+
+// exports.deserialize = function (hash, done){
+
+// 	UserModel.findOne({'hash': hash***REMOVED***, function (err, item){
+// 		done(err, item);
+// ***REMOVED***);
+// ***REMOVED***;
