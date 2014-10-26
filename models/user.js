@@ -9,16 +9,19 @@ var r = require('redis');
 var redis = r.createClient(_e.redis.port, _e.redis.host, {auth_pass: _e.redis.pass***REMOVED*** );
 var uuid = require('node-uuid');
 
+//sadd api-keys 87fe3910-5978-11e4-8ed6-0800200c9a66
+var apiKeys = ["87fe3910-5978-11e4-8ed6-0800200c9a66"]
+
 var UserSchema   = new Schema({
-	hash: String,
+	_id: String,
 	firstname: String,
 	lastname: String,
 	password: String, 
 	email: String,
 	studentNumber: Number,
 	key: String,
-	going: [ { type: Schema.Types.ObjectId, ref: 'Event' ***REMOVED*** ],
-	maybe: [ { type: Schema.Types.ObjectId, ref: 'Event' ***REMOVED*** ]
+	going: [ { type: String, ref: 'Event' ***REMOVED*** ],
+	maybe: [ { type: String, ref: 'Event' ***REMOVED*** ]
 ***REMOVED***);
 
 var UserModel = mongoose.model('User', UserSchema);
@@ -26,8 +29,9 @@ var UserModel = mongoose.model('User', UserSchema);
 exports.schema = UserSchema;
 
 exports.createUser = function(req, res) {
+	console.log(req.body);
 	var userInstance = new UserModel();		// create a new instance of the member model
-	userInstance.hash = crypto.createHash('md5').update(req.body.studentNumber + (new Date).toString()).digest("hex");
+	userInstance._id = crypto.createHash('md5').update(req.body.studentNumber + (new Date).toString()).digest("hex");
 	userInstance.firstname = req.body.firstname;  // set the members name (comes from the request)
 	userInstance.lastname = req.body.lastname;
 	userInstance.password = crypto.createHash('md5').update(req.body.password).digest("hex");
@@ -45,26 +49,26 @@ exports.createUser = function(req, res) {
 ***REMOVED***);
 ***REMOVED***
 
-exports.f = function(req, res){
+// exports.f = function(req, res){
 	
-***REMOVED***
+// ***REMOVED***
 
-exports.findMe = function(req,res){
-	console.log(req.body);
-	UserModel.findOne({email: req.body.email***REMOVED***, function(err, user) {
-		if (err) res.json({message:err, success:false***REMOVED***);
+// exports.findMe = function(req,res){
+// 	console.log(req.body);
+// 	UserModel.findOne({email: req.body.email***REMOVED***, function(err, user) {
+// 		if (err) res.json({message:err, success:false***REMOVED***);
 		
-		if (user && user.password === crypto.createHash('md5').update(req.body.password).digest("hex")){
-			res.json({user: user, message:'Found User', success:false***REMOVED***);
-	***REMOVED***
-		else {
-			res.json({message: 'Permission Denied', success:false***REMOVED***);
-	***REMOVED***
-***REMOVED***);
-***REMOVED***
+// 		if (user && user.password === crypto.createHash('md5').update(req.body.password).digest("hex")){
+// 			res.json({user: user, message:'Found User', success:false***REMOVED***);
+// 	***REMOVED***
+// 		else {
+// 			res.json({message: 'Permission Denied', success:false***REMOVED***);
+// 	***REMOVED***
+// ***REMOVED***);
+// ***REMOVED***
 
 exports.readUser = function(req, res) {
-	UserModel.findOne({hash: req.params.user_id***REMOVED***, function(err, user) {
+	UserModel.findOne({_id: req.params.user_id***REMOVED***, function(err, user) {
 		if (err)
 			res.send(err);
 		res.json(user);
@@ -73,7 +77,7 @@ exports.readUser = function(req, res) {
 
 exports.updateUser = function(req, res) {
 
-	UserModel.findOne({hash: req.params.user_id***REMOVED***, function(err, user) {
+	UserModel.findOne({_id: req.params.user_id***REMOVED***, function(err, user) {
 		if (err) res.json({message:err, success:false***REMOVED***);
 		if (user.password === crypto.createHash('md5').update(req.body.password).digest("hex")){
 			if (req.body.firstname) user.firstname = req.body.firstname;
@@ -96,7 +100,7 @@ exports.updateUser = function(req, res) {
 exports.deleteUser = function(req, res) {
 	if (_.contains(keys, req.body.key)){
 		UserModel.remove({
-			hash: req.params.hash
+			_id: req.params.user_id
 	***REMOVED*** function(err, user) {
 			if (err)
 				res.send(err);
@@ -110,7 +114,7 @@ exports.deleteUser = function(req, res) {
 ***REMOVED***
 
 exports.changePassword = function(req, res){
-	UserModel.findOne({hash: req.params.hash***REMOVED***, function(err, user){
+	UserModel.findOne({_id: req.params.user_id***REMOVED***, function(err, user){
 		if (err) res.json({message:err, success:false***REMOVED***);
 		if (user.password === crypto.createHash('md5').update(req.body.confirm_password).digest('hex')){
 			user.password = crypto.createHash('md5').update(req.body.new_password).digest('hex');
@@ -147,16 +151,16 @@ exports.changePassword = function(req, res){
 //     ***REMOVED***);
 // ***REMOVED***;
 
-exports.accessToken = function(req, res){
-	var username = req.body.email;
+exports.generateAccessToken = function(req, res){
+	var email = req.body.email;
 	var password = crypto.createHash('md5').update(req.body.password).digest("hex");
 	var apikey = req.body.api_key;
 
 	redis.sismember ('api-keys', apikey, function(err, exists){
 		if (exists){
-			UserModel.findOne({'email':username***REMOVED***,function (err, item){
+			UserModel.findOne({'email':email***REMOVED***,function (err, item){
 				if (err) return res.json(err);
-				else if (item){
+				if (item){
 					if (password == item.password){
 						//api key is legit, username and password checkout, create an access token in redis...
 						var access_token = uuid.v1();
@@ -165,20 +169,26 @@ exports.accessToken = function(req, res){
 							firstname: item.firstname,
 							lastname: item.lastname,
 							email: item.email,
-							hash: item.hash,
+							_id: item._id,
 							studentid: item.studentNumber,
 							access_token: access_token
 					***REMOVED*** message: "Successfully created access token.", success:true***REMOVED***);
 				***REMOVED***
-					else res.json ({message: 'Incorrect Password', success:false ***REMOVED***);
+					else return res.json ({message: 'Incorrect Password', success:false ***REMOVED***);
 			***REMOVED***
 				else return res.json ({message:'Incorrect Username', success:false ***REMOVED***);
 		***REMOVED***);
 	***REMOVED***
 		else {
-			res.json({message:'Invalid Api Key', success:false***REMOVED***);
+			return res.json({message:'Invalid Api Key', success:false***REMOVED***);
 	***REMOVED***
 ***REMOVED***);
+***REMOVED***
+
+exports.removeAccessToken = function(req, res){
+	// console.log(req.body.access_token);
+	redis.srem('access-tokens', req.body.access_token);
+	return res.json("successfully signed out");
 ***REMOVED***
 
 // exports.serialize = function (user, done){

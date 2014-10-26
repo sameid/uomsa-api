@@ -50,6 +50,8 @@ var port = process.env.PORT || 3000; // set our port
 var mongoose = require('mongoose');
 var eventHandler = require('./models/event');
 var userHandler = require('./models/user');
+var notificationHandler = require('./models/notify')
+var statusHandler = require('./models/status')
 
 var connection = mongoose.connect(Environment.mongo.connectString, function(err){
 	if (err) console.log(err);
@@ -102,13 +104,13 @@ router.get('/', function(req, res) {
 
 
 router.route('/event')
-	.post(eventHandler.createEvent)// create a event (accessed at POST http://localhost:8080/api/events) -- remember to change back to authenticated.
-	.get(eventHandler.readAllEvents);// get all the events (accessed at GET http://localhost:8080/api/events)
+	.post(eventHandler.createEvent)
+	.get(eventHandler.readAllEvents);
 
 router.route('/event/:event_id')
-	.get(eventHandler.readEvent)// get the event with that id
-	.put(eventHandler.updateEvent)// update the event with this id
-	.delete(eventHandler.deleteEvent);// delete the event with this id
+	.get(eventHandler.readEvent)
+	.put(eventHandler.updateEvent)
+	.delete(eventHandler.deleteEvent);
 
 router.route('/event/:event_id/poster')
 	.get(eventHandler.poster);	
@@ -116,19 +118,32 @@ router.route('/event/:event_id/poster')
 router.route('/upcomingEvents')
 	.get(eventHandler.findAllUpcoming);
 
-router.route('/event/upcoming/user/:user_id')
-	.get(eventHandler.findAllAttending)
+// router.route('/event/upcoming/user/:user_id')
+// 	.get(eventHandler.findAllAttending)
 
-router.route('/event/:event_id/user/:user_id/')
-	.get(eventHandler.findEventStatusByUser)
-	.post(eventHandler.addUserToEvent)
-	.delete(eventHandler.removeUserFromEvent)
+// router.route('/event/user/:event_id/:user_id')
+// 	.get(eventHandler.findEventStatusByUser)
+// 	.post(eventHandler.addUserToEvent)
+// 	.delete(eventHandler.removeUserFromEvent)
 
 // router.route('/events/status/:event_hash/:user_hash')
 // 	.get(eventHandler.status_get);
 
 // router.route('/events/status')
 // 	.post(eventHandler.status);
+
+router.route('/status')
+	.post(statusHandler.createStatus)
+	.get(statusHandler.readAllStatuses);
+
+router.route('/status/:status_id')
+	.get(statusHandler.readStatus)
+	.put(statusHandler.updateStatus)
+	.delete(statusHandler.deleteStatus);
+
+router.route('/_status/:event_id/:user_id')
+	.get(statusHandler.findStatusByEventAndUser)
+	.delete(statusHandler.deleteStatusByEventAndUser);
 
 router.route('/user')
 	.post(userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
@@ -139,7 +154,13 @@ router.route('/user/:user_id')
 	.delete(userHandler.deleteUser);	// delete the event with this id
 
 router.route('/login')
-	.post(userHandler.accessToken);
+	.post(userHandler.generateAccessToken);
+
+router.route('/logout')
+	.post(userHandler.removeAccessToken);
+
+router.route('/registerDevice')
+	.post(notificationHandler.registerDevice);
 
 // router.route('/users/_P/:user_id')
 // 	.post(userHandler.changePassword);

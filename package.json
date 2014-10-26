@@ -2,7 +2,7 @@
 	"name": "uomsa-jamaa",
 	"subdomain": "jamaa",
 	"description": "Jamaa is the backend API for the uoMSA Event App",
-	"version": "0.0.1-1",
+	"version": "0.0.1-5",
 	"engines": {
 		"node": "0.8.x"
 ***REMOVED***
@@ -22,8 +22,11 @@
 		"express-session": "1.7.6",
 		"cors": "2.4.1",
 		"string": "1.9.1",
-		"multer": "0.1.4",
-		"node-gcm-service": "*",
-		"underscore": "*"
+		"multer": "0.1.6",
+		"node-gcm-service": "0.2.8",
+		"underscore": "1.7.0",
+		"redis": "0.12.1",
+		"googlemaps": "0.1.20",
+		"node-uuid": "1.4.1"
 ***REMOVED***
 ***REMOVED***

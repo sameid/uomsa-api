@@ -5,6 +5,8 @@ var crypto = require('crypto');
 var gm = require('googlemaps');
 var _ = require('underscore');
 
+var n = require('./notify.js');
+
 var EventSchema   = new Schema({
 	_id: String,
 	title: String,
@@ -21,8 +23,6 @@ var EventSchema   = new Schema({
 	date: Date,
 	startTime: String,
 	endTime: String,
-	going : [ { type: Schema.Types.ObjectId, ref: 'User' ***REMOVED*** ],
-	maybe : [ { type: Schema.Types.ObjectId, ref: 'User' ***REMOVED*** ],
 	poster: {
 		data: Buffer,
 		contentType: String
@@ -66,57 +66,74 @@ exports.createEvent = function(req, res) {
 			if (err)
 				res.send(err);
 
+			n.notify("New Event from the uomsa.", eventInstance.title);				
 			res.json({
 				message: 'Event Successfully Created!'
-		***REMOVED***)
+		***REMOVED***);				
 	***REMOVED***);
 
 ***REMOVED***);
 
 ***REMOVED***
 
-exports.addUserToEvent = function(req, res){
-	EventModel.findOne( {_id: req.params.event_id***REMOVED*** , function(err, eventInstance){
-		if (err)res.send(err);
-		if (eventInstance){
-			if (request.body.type === "going")eventInstance.going.push(req.params.user_id);
-			else if (request.body.type === 'maybe')eventInstance.maybe.push(req.params.user_id);
-			eventInstance.save(function(err){
-				if (err) res.send(err);
-				res.send('Successfully added user to event.');
-		***REMOVED***);	
-	***REMOVED***
-		else{
-			res.json('event not found');
-	***REMOVED***
-***REMOVED***);
-***REMOVED*** 
+// exports.findEventStatusByUser = function(req, res){
+// 	EventModel
+// 		.findOne({_id: req.params.event_id***REMOVED***)
+// 		.where('going').in([req.params.user_id])
+// 		.sort('date')
+// 		.select("_id title description address date startTime endTime created")
+// 		.exec(function(err, eventInstance){
+// 			if (err) res.send(err);
+// 			if (eventInstance) res.json({message:'RSVP - Going'***REMOVED***);
+// 			else res.json({message:'RSVP - Not Going'***REMOVED***);
+// 	***REMOVED***);
+// ***REMOVED***
 
-exports.removeUserFromEvent = function(req, res){
-	EventModel.findOne( {_id: req.params.event_id***REMOVED***, function(err, eventInstance){
-		if (err) res.send(err);
-		if (eventInstance){
-			var mi = eventInstance.maybe.indexOf(req.params.user_id);
-	        var gi = eventInstance.going.indexOf(req.params.user_id);
-	        if (mi > -1)eventInstance.maybe.splice(mi, 1);
-	        if (gi > -1)eventInstance.going.splice(gi, 1);
-	        res.json({message:'removed user from event'***REMOVED***);	
-	***REMOVED***
-***REMOVED***);
-***REMOVED***
 
-exports.findEventStatusByUser = function(req, res){
-	EventModel
-		.findOne({_id: req.params.event_id***REMOVED***)
-		.where('going').in([req.params.user_id])
-		.sort('date')
-		.select("_id title description address date startTime endTime created")
-		.exec(function(err, eventInstance){
-			if (err) res.send(err);
-			if (eventInstance) res.json('going');
-			else res.json({message:'not-going'***REMOVED***);
-	***REMOVED***);
-***REMOVED***
+
+// exports.addUserToEvent = function(req, res){
+// 	console.log('some how...')
+// 	EventModel.findOne( {_id: req.params.event_id***REMOVED*** , function(err, eventInstance){
+// 		if (err)res.send(err);
+// 		if (eventInstance){
+
+// 			var mi = eventInstance.maybe.indexOf(req.params.user_id);
+// 	        var gi = eventInstance.going.indexOf(req.params.user_id);
+// 	        if (mi > -1)eventInstance.maybe.splice(mi, 1);
+// 	        if (gi > -1)eventInstance.going.splice(gi, 1);
+
+// 			if (req.body.type === "going")eventInstance.going.push(req.params.user_id);
+// 			else if (req.body.type === 'maybe')eventInstance.maybe.push(req.params.user_id);
+
+// 			eventInstance.save(function(err){
+// 				if (err) res.send(err);
+// 				res.send('Successfully added user to event.');
+// 		***REMOVED***);	
+// 	***REMOVED***
+// 		else{
+// 			res.json('event not found');
+// 	***REMOVED***
+// ***REMOVED***);
+// ***REMOVED*** 
+
+// exports.removeUserFromEvent = function(req, res){
+// 	EventModel.findOne( {_id: req.params.event_id***REMOVED***, function(err, eventInstance){
+// 		if (err) res.send(err);
+// 		if (eventInstance){
+// 			var mi = eventInstance.maybe.indexOf(req.params.user_id);
+// 	        var gi = eventInstance.going.indexOf(req.params.user_id);
+// 	        if (mi > -1)eventInstance.maybe.splice(mi, 1);
+// 	        if (gi > -1)eventInstance.going.splice(gi, 1);
+// 	        eventInstance.save(function (err){
+// 				if (err) return res.send(err);
+// 				return res.json({message:'removed user from event'***REMOVED***);
+// 	        ***REMOVED***);
+	        	
+// 	***REMOVED***
+// ***REMOVED***);
+// ***REMOVED***
+
+
 
 // exports.status = function (req, res){
 // 	EventModel.findOne({_id:req.body.event_id***REMOVED***, function (err, eventInstance) {
@@ -156,25 +173,25 @@ exports.findAllUpcoming = function (req, res){
 	 	// .where('date').gt(new Date())
 		.select("_id title description address date startTime endTime created")
 		.exec(function (err, events){
-			if (err)res.send(err);
-			res.json(events);
+			if (err) return res.send(err);
+			return res.json(events);
 	***REMOVED***);
 ***REMOVED***
 
-//change to projection thing instead
-exports.findAllAttending = function(req, res){
-	EventModel
-		.find()
-		.where('going').in([req.params.user_id])
-		.sort('date')
-		.select("_id title description address date startTime endTime created")
-		.exec(function(err, events){
-			if (err) res.send(err);
-			if (events) res.json(events);
-			else res.json({message:'not attending'***REMOVED***);
-	***REMOVED***);
+// //change to projection thing instead
+// exports.findAllAttending = function(req, res){
+// 	EventModel
+// 		.find()
+// 		.where('going').in([req.params.user_id])
+// 		.sort('date')
+// 		.select("_id title description address date startTime endTime created")
+// 		.exec(function(err, events){
+// 			if (err) return res.send(err);
+// 			if (events) return res.json(events);
+// 			return res.json("not attending any events");
+// 	***REMOVED***);
 
-***REMOVED***
+// ***REMOVED***
 
 exports.poster = function (req,res){
 	EventModel.findOne({_id:req.params.event_id***REMOVED***, function (err, eventInstance) {
