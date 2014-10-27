@@ -21,12 +21,16 @@ exports.notify = function(title, _message){
 ***REMOVED***
 
 exports.registerDevice = function(req, res){
-	if (req.body.user_id){
-		//push to some hset
-***REMOVED***
-	else {
+	// if (req.body.user_id){
+	// 	//push to some hset
+	// ***REMOVED***
+	// else {
 		redis.sadd('gcm-reg-ids', req.body.reg_id);
 		res.send('registered with api');
+	// ***REMOVED***
+
 ***REMOVED***
 
+exports.sendNotifications = function(req, res){
+	res.send('etst');
 ***REMOVED***

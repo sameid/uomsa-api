@@ -2,6 +2,8 @@ var fs 			 = require('fs');
 var mongoose     = require('mongoose');
 var Schema       = mongoose.Schema;
 var crypto = require('crypto');
+var EventModel = require('./event').EventModel;
+var async = require('async');
 
 var StatusSchema   = new Schema({
 	_id: String,
@@ -99,4 +101,31 @@ exports.deleteStatusByEventAndUser = function (req, res){
 		else res.json({message:'status not found'***REMOVED***);
 ***REMOVED***);
 
+***REMOVED***
+
+exports.attending = function(req, res){
+	var user_id = req.params.user_id
+	StatusModel		
+		.find()
+		.where('user_id').equals(user_id)
+		.select("event_id")
+		.exec(function(err, statuses){
+			if (err) res.send(err);
+			if (statuses){
+
+				async.map(statuses, function(item, callback){
+					callback(null, item.event_id)
+			***REMOVED*** function (err, results){
+					EventModel
+						.find()
+						.where('_id').in(results)
+						.select("_id title")
+						.exec(function(err, events){
+							res.json(events);
+					***REMOVED***);
+			***REMOVED***);
+
+		***REMOVED***
+			else res.json({message: "not statuses"***REMOVED***);
+	***REMOVED***);
 ***REMOVED***

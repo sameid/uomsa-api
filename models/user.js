@@ -20,8 +20,6 @@ var UserSchema   = new Schema({
 	email: String,
 	studentNumber: Number,
 	key: String,
-	going: [ { type: String, ref: 'Event' ***REMOVED*** ],
-	maybe: [ { type: String, ref: 'Event' ***REMOVED*** ]
 ***REMOVED***);
 
 var UserModel = mongoose.model('User', UserSchema);
@@ -114,19 +112,29 @@ exports.deleteUser = function(req, res) {
 ***REMOVED***
 
 exports.changePassword = function(req, res){
-	UserModel.findOne({_id: req.params.user_id***REMOVED***, function(err, user){
+	UserModel.findOne({_id: req.body.user_id***REMOVED***, function(err, user){
 		if (err) res.json({message:err, success:false***REMOVED***);
-		if (user.password === crypto.createHash('md5').update(req.body.confirm_password).digest('hex')){
-			user.password = crypto.createHash('md5').update(req.body.new_password).digest('hex');
-			user.save(function(err){
-				if(err) return res.json({message:err, success:false***REMOVED***);
-				res.json({message:'Password changed successfully', success:true***REMOVED***);
-		***REMOVED***);	
+		if (user.password === encrypt(req.body.old_password)){
+			console.log('entered');
+			if (req.body.new_password === req.body.confirm_password){
+				user.password = crypto.createHash('md5').update(req.body.new_password).digest('hex');
+				user.save(function(err){
+					if(err) return res.json({message:err, success:false***REMOVED***);
+					res.json({message:'Password changed successfully', success:true***REMOVED***);
+			***REMOVED***);
+		***REMOVED***
+			else {
+				res.json({message: "Permission Denied", success:false***REMOVED***);		
+		***REMOVED***
 	***REMOVED***
 		else {
 			res.json({message: "Permission Denied", success:false***REMOVED***);		
 	***REMOVED***
 ***REMOVED***);
+***REMOVED***
+
+var encrypt = function (val){
+	return crypto.createHash('md5').update(val).digest('hex')
 ***REMOVED***
 
 // exports.authenticate = function (email, password, done){

@@ -31,6 +31,7 @@ var EventSchema   = new Schema({
 
 
 var EventModel = mongoose.model('Event', EventSchema);
+exports.EventModel = EventModel;
 
 //Will be used mainly in the Admin console
 exports.createEvent = function(req, res) {
@@ -171,7 +172,7 @@ exports.findAllUpcoming = function (req, res){
 	EventModel
 		.find()
 	 	// .where('date').gt(new Date())
-		.select("_id title description address date startTime endTime created")
+		.select("_id title")
 		.exec(function (err, events){
 			if (err) return res.send(err);
 			return res.json(events);

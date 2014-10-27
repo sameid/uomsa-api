@@ -44,7 +44,7 @@ app.use(express.static('./public'));
 // app.use(passport.session());
 
 
-var port = process.env.PORT || 3000; // set our port
+var port = process.env.PORT || 8080; // set our port
 
 //DB Specific Handling
 var mongoose = require('mongoose');
@@ -118,6 +118,9 @@ router.route('/event/:event_id/poster')
 router.route('/upcomingEvents')
 	.get(eventHandler.findAllUpcoming);
 
+router.route('/attending/:user_id')
+	.get(statusHandler.attending);
+
 // router.route('/event/upcoming/user/:user_id')
 // 	.get(eventHandler.findAllAttending)
 
@@ -152,6 +155,12 @@ router.route('/user/:user_id')
 	.get(userHandler.readUser)// get the event with that id
 	.put(userHandler.updateUser)// update the event with this id
 	.delete(userHandler.deleteUser);	// delete the event with this id
+
+router.route('/user/pc')
+	.post(userHandler.changePassword);
+
+router.route('/notify')
+	.post(notificationHandler.sendNotifications)
 
 router.route('/login')
 	.post(userHandler.generateAccessToken);
