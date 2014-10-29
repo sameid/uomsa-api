@@ -76,9 +76,13 @@ var connection = mongoose.connect(Environment.mongo.connectString, function(err)
 // ***REMOVED***
 
 var auth = function (req, res, next){
-	redis.sismember('access-tokens', req.body.access_token, function(err, exists){
+
+	redis.sismember('access-tokens', req.get('access-token'), function(err, exists){
 		if (err) res.send('Could not create connection to Redis.');
-		if (exists) next();
+		if (exists) {
+			console.log('token-exists');
+			next();
+	***REMOVED***
 		else {
 			res.send('Invalid access-token provided.');
 	***REMOVED***
@@ -104,13 +108,13 @@ router.get('/', function(req, res) {
 
 
 router.route('/event')
-	.post(eventHandler.createEvent)
-	.get(eventHandler.readAllEvents);
+	.post(auth, eventHandler.createEvent)
+	.get(auth, eventHandler.readAllEvents);
 
 router.route('/event/:event_id')
 	.get(eventHandler.readEvent)
-	.put(eventHandler.updateEvent)
-	.delete(eventHandler.deleteEvent);
+	.put(auth, eventHandler.updateEvent)
+	.delete(auth, eventHandler.deleteEvent);
 
 router.route('/event/:event_id/poster')
 	.get(eventHandler.poster);	
@@ -119,7 +123,7 @@ router.route('/upcomingEvents')
 	.get(eventHandler.findAllUpcoming);
 
 router.route('/attending/:user_id')
-	.get(statusHandler.attending);
+	.get(auth, statusHandler.attending);
 
 // router.route('/event/upcoming/user/:user_id')
 // 	.get(eventHandler.findAllAttending)
@@ -136,28 +140,28 @@ router.route('/attending/:user_id')
 // 	.post(eventHandler.status);
 
 router.route('/status')
-	.post(statusHandler.createStatus)
-	.get(statusHandler.readAllStatuses);
+	.post(auth, statusHandler.createStatus)
+	.get(auth, statusHandler.readAllStatuses);
 
 router.route('/status/:status_id')
-	.get(statusHandler.readStatus)
-	.put(statusHandler.updateStatus)
-	.delete(statusHandler.deleteStatus);
+	.get(auth, statusHandler.readStatus)
+	.put(auth, statusHandler.updateStatus)
+	.delete(auth, statusHandler.deleteStatus);
 
 router.route('/_status/:event_id/:user_id')
-	.get(statusHandler.findStatusByEventAndUser)
-	.delete(statusHandler.deleteStatusByEventAndUser);
+	.get(auth, statusHandler.findStatusByEventAndUser)
+	.delete(auth, statusHandler.deleteStatusByEventAndUser);
 
 router.route('/user')
 	.post(userHandler.createUser);// create a user (accessed at POST http://localhost:8080/api/user)
 
 router.route('/user/:user_id')
-	.get(userHandler.readUser)// get the event with that id
-	.put(userHandler.updateUser)// update the event with this id
-	.delete(userHandler.deleteUser);	// delete the event with this id
+	.get(auth, userHandler.readUser)// get the event with that id
+	.put(auth, userHandler.updateUser)// update the event with this id
+	.delete(auth, userHandler.deleteUser);	// delete the event with this id
 
 router.route('/user/pc')
-	.post(userHandler.changePassword);
+	.post(auth, userHandler.changePassword);
 
 router.route('/notify')
 	.post(notificationHandler.sendNotifications)

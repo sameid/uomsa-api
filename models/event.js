@@ -171,7 +171,8 @@ exports.createEvent = function(req, res) {
 exports.findAllUpcoming = function (req, res){
 	EventModel
 		.find()
-	 	// .where('date').gt(new Date())
+	 	.where('date').gt(new Date())
+	 	.sort('date')
 		.select("_id title")
 		.exec(function (err, events){
 			if (err) return res.send(err);
@@ -184,7 +185,7 @@ exports.findAllUpcoming = function (req, res){
 // 	EventModel
 // 		.find()
 // 		.where('going').in([req.params.user_id])
-// 		.sort('date')
+// 		
 // 		.select("_id title description address date startTime endTime created")
 // 		.exec(function(err, events){
 // 			if (err) return res.send(err);
