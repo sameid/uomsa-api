@@ -2,7 +2,7 @@
 	"name": "uomsa-jamaa",
 	"subdomain": "jamaa",
 	"description": "Jamaa is the backend API for the uoMSA Event App",
-	"version": "0.0.1-10",
+	"version": "0.0.1-12",
 	"engines": {
 		"node": "0.10.x"
 ***REMOVED***
