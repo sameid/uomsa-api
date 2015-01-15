@@ -17,18 +17,18 @@ app.utils.templates = (function() {
                 console.log(view);
                 deferreds.push($.get('tpl/' + view + '.html', function(data) {
                     app.views[view].prototype.template = _.template(data);
-                ***REMOVED***, 'html'));
-            ***REMOVED*** else {
+                }, 'html'));
+            } else {
                 alert(view + " not found");
-            ***REMOVED***
-        ***REMOVED***);
+            }
+        });
 
         $.when.apply(null, deferreds).done(callback);
-    ***REMOVED***
+    }
 
     // The public API
     return {
         load: load
-    ***REMOVED***;
+    };
 
-***REMOVED***());
+}());

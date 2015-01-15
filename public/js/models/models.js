@@ -13,18 +13,18 @@ app.models.Event = Backbone.Model.extend({
     urlRoot:"http://localhost:3000/api/event",
     idAttribute:"_id"
 
-***REMOVED***);
+});
 
 app.models.EventCollection = Backbone.Collection.extend({
     model: app.models.Event,
     url:"http://localhost:3000/api/event"
-***REMOVED***);
+});
 
 // var originalSync = Backbone.sync;
 // Backbone.sync = function (method, model, options) {
 //     if (method === "read") {
 //         options.dataType = "jsonp";
 //         return originalSync.apply(Backbone, arguments);
-//     ***REMOVED***
+//     }
 
-// ***REMOVED***;
+// };

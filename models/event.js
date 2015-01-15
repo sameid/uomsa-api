@@ -13,21 +13,21 @@ var EventSchema   = new Schema({
 	location: {
 		lng: Number,
 		lat: Number
-***REMOVED***
+	},
 	created: {
 		type:Date, 
 		default: Date.now
-***REMOVED***
+	},
 	date: Date,
 	startTime: String,
 	endTime: String,
-	going : [ { type: Schema.Types.ObjectId, ref: 'User' ***REMOVED*** ],
-	maybe : [ { type: Schema.Types.ObjectId, ref: 'User' ***REMOVED*** ],
+	going : [ { type: Schema.Types.ObjectId, ref: 'User' } ],
+	maybe : [ { type: Schema.Types.ObjectId, ref: 'User' } ],
 	poster: {
 		data: Buffer,
 		contentType: String
-***REMOVED***
-***REMOVED***);
+	}
+});
 
 
 var EventModel = mongoose.model('Event', EventSchema);
@@ -47,11 +47,11 @@ exports.createEvent = function(req, res) {
 		if (err){
 			eventInstance.location.lat = 0;
 			eventInstance.location.lng = 0;
-	***REMOVED***
+		}
 		else {
 			eventInstance.location.lat = results.results[0].geometry.location.lat;
 			eventInstance.location.lng = results.results[0].geometry.location.lng;
-	***REMOVED***
+		}
 
 		eventInstance.date = req.body.date;
 		eventInstance.startTime = req.body.start;
@@ -68,34 +68,34 @@ exports.createEvent = function(req, res) {
 
 			res.json({
 				message: 'Event Successfully Created!'
-		***REMOVED***)
-	***REMOVED***);
+			})
+		});
 
-***REMOVED***);
+	});
 
-***REMOVED***
+}
 
 exports.addUserToEvent = function(req, res){
-	EventModel.findOne( {_id: req.body.event_id***REMOVED*** , function(err, eventInstance){
+	EventModel.findOne( {_id: req.body.event_id} , function(err, eventInstance){
 		if (err)res.send(err);
 		eventInstance.going.push(req.body.user_id);
 		eventInstance.save(function(err){
 			if (err) res.send(err);
 			res.send('Successfully added user to event.');
-	***REMOVED***);
-***REMOVED***);
-***REMOVED*** 
+		});
+	});
+} 
 
 exports.removeUserFromEvent = function(req, res){
-	EventModel.findOne( {_id: req.body.event_id***REMOVED***, function(err eventInstance){
+	EventModel.findOne( {_id: req.body.event_id}, function(err, eventInstance){
 		if (err) res.send(err);
-		EventModel.findOneAndUpdate({userId: userId***REMOVED***, {$pull: {alerts: {_id: alertId***REMOVED******REMOVED******REMOVED***).exec();
+		EventModel.findOneAndUpdate({userId: userId}, {$pull: {alerts: {_id: alertId}}}).exec();
 
-***REMOVED***);
-***REMOVED***
+	});
+}
 
 exports.status = function (req, res){
-	EventModel.findOne({_id:req.body.event_id***REMOVED***, function (err, eventInstance) {
+	EventModel.findOne({_id:req.body.event_id}, function (err, eventInstance) {
         if (err) res.send(err);
 
 
@@ -109,36 +109,36 @@ exports.status = function (req, res){
         	eventInstance.going.push(req.body.user_hash);
         	eventInstance.save(function (err){
         		if (err)res.send(err);
-        		res.json({message:'Successfully added user ' + req.body.user_hash + ' going to event  ' + req.body.event_hash***REMOVED***);
-        ***REMOVED***); 
-        ***REMOVED***
+        		res.json({message:'Successfully added user ' + req.body.user_hash + ' going to event  ' + req.body.event_hash});
+        	}); 
+        }
         else if (req.body.status == CONSTANTS.STATUS_MAYBE){
         	eventInstance.maybe.push(req.body.user_hash);
         	eventInstance.save(function (err){
         		if (err)res.send(err);
-        		res.json({message:'Successfully added user ' + req.body.user_hash + ' maybe going to event ' + req.body.event_hash***REMOVED***);
-        ***REMOVED***);
+        		res.json({message:'Successfully added user ' + req.body.user_hash + ' maybe going to event ' + req.body.event_hash});
+        	});
 
-        ***REMOVED***
+        }
         else if (req.body.status == CONSTANTS.STATUS_NOT_GOING){
         	eventInstance.save(function(err){
         		if (err)res.send(err);
-        		res.json({message:'User Removed from event.'***REMOVED***);
-        ***REMOVED***);
-        ***REMOVED***
-    ***REMOVED***);
-***REMOVED***
+        		res.json({message:'User Removed from event.'});
+        	});
+        }
+    });
+}
 
 exports.findAllUpcoming = function (req, res){
 	EventModel
 		.find()
-	 	// .where('date').gt(new Date())
+	 	.where('date').gt(new Date())
 		.select("_id title description address date startTime endTime created")
 		.exec(function (err, events){
 			if (err)res.send(err);
 			res.json(events);
-	***REMOVED***);
-***REMOVED***
+		});
+}
 
 exports.findAllAttending = function(req, res){
 	EventModel
@@ -150,17 +150,17 @@ exports.findAllAttending = function(req, res){
 			if (err) res.send(err);
 			console.log(events);
 			res.json(events);
-	***REMOVED***);
+		});
 
-***REMOVED***
+}
 
 exports.poster = function (req,res){
-	EventModel.findOne({_id:req.params.event_id***REMOVED***, function (err, eventInstance) {
+	EventModel.findOne({_id:req.params.event_id}, function (err, eventInstance) {
         if (err) return next(err);
         res.contentType(eventInstance.poster.contentType);
         res.send(eventInstance.poster.data);
-    ***REMOVED***);
-***REMOVED***
+    });
+}
 
 exports.readAllEvents = function(req, res) {
 	EventModel
@@ -170,18 +170,18 @@ exports.readAllEvents = function(req, res) {
 		if (err)res.send(err);
 
 		res.json(events);
-***REMOVED***);
-***REMOVED***
+	});
+}
 
 exports.readEvent = function(req, res) {
 	console.log('test');
-	EventModel.findOne({_id:req.params.event_id***REMOVED***, function(err, eventInstance) {
+	EventModel.findOne({_id:req.params.event_id}, function(err, eventInstance) {
 		if (err)
 			res.send(err);
-		eventInstance.poster = {***REMOVED***;
+		eventInstance.poster = {};
 		res.json(eventInstance);
-***REMOVED***);
-***REMOVED***
+	});
+}
 
 exports.updateEvent = function(req, res) {
 	EventModel.findById(req.params.event_id, function(err, eventInstance) {
@@ -194,21 +194,21 @@ exports.updateEvent = function(req, res) {
 			if (err)
 				res.send(err);
 
-			res.json({ message: 'event updated!' ***REMOVED***);
-	***REMOVED***);
-***REMOVED***);
-***REMOVED***
+			res.json({ message: 'event updated!' });
+		});
+	});
+}
 
 exports.deleteEvent = function(req, res) {
 	EventModel.remove({
 		_id: req.params.event_id
-***REMOVED*** function(err, eventInstance) {
+	}, function(err, eventInstance) {
 		if (err)
 			res.send(err);
 
-		res.json({ message: 'Successfully deleted' ***REMOVED***);
-***REMOVED***);
-***REMOVED***
+		res.json({ message: 'Successfully deleted' });
+	});
+}
 
 
 

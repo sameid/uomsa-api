@@ -11,7 +11,7 @@ var morgan = require('morgan');
 var cors = require('cors');
 
 var r = require('redis');
-var redis = r.createClient(Environment.redis.port, Environment.redis.host, {auth_pass: Environment.redis.pass ? Environment.redis.pass : ''***REMOVED*** );
+var redis = r.createClient(Environment.redis.port, Environment.redis.host, {auth_pass: Environment.redis.pass ? Environment.redis.pass : ''} );
 
 //Express
 var app	= express();
@@ -23,8 +23,8 @@ var app	= express();
 // var RedisStore = require('connect-redis')(session);
 
 //Middleware Instantiation
-app.use(multer({uploadDir:'./uploads'***REMOVED***));
-app.use(bodyParser({strict: false***REMOVED***));
+app.use(multer({uploadDir:'./uploads'}));
+app.use(bodyParser({strict: false}));
 app.use(cookieParser());
 app.use(morgan('tiny'));
 app.use(cors());
@@ -33,12 +33,12 @@ app.use(express.static('./public'));
 //     store: new RedisStore({
 //         host: Environment.redis.host, 
 //         port: Environment.redis.port
-//     ***REMOVED***),
+//     }),
 //     secret: 'd4t4b4s3',
 //     cookie: {
 //     	httpOnly: false
-//     ***REMOVED***
-// ***REMOVED***));
+//     }
+// }));
 
 // app.use(passport.initialize());
 // app.use(passport.session());
@@ -55,39 +55,41 @@ var statusHandler = require('./models/status')
 
 var connection = mongoose.connect(Environment.mongo.connectString, function(err){
 	if (err) console.log(err);
-***REMOVED***); // connect to our database
+}); // connect to our database
 
 
 //Passport Specific stuff
-// passport.use(new BasicStrategy ({***REMOVED***, userHandler.authenticate));
+// passport.use(new BasicStrategy ({}, userHandler.authenticate));
 // passport.use(new LocalStrategy(userHandler.authenticate));
 // passport.serializeUser(userHandler.serialize);
 // passport.deserializeUser(userHandler.deserialize);
 
 // var auth = function (req, res, next) {
-//   if (req.isAuthenticated()) { next(); ***REMOVED***
+//   if (req.isAuthenticated()) { next(); }
 //   else {
 //   	res.send("Your request was not authenticated, please login.");
-//   ***REMOVED***
-// ***REMOVED***
+//   }
+// }
 
 // var auth = function(){
-// 	return passport.authenticate('basic', {session:false***REMOVED***);
-// ***REMOVED***
+// 	return passport.authenticate('basic', {session:false});
+// }
 
 var auth = function (req, res, next){
+
+	// next();
 
 	redis.sismember('access-tokens', req.get('access-token'), function(err, exists){
 		if (err) res.send('Could not create connection to Redis.');
 		if (exists) {
 			console.log('token-exists');
 			next();
-	***REMOVED***
+		}
 		else {
 			res.send('Invalid access-token provided.');
-	***REMOVED***
-***REMOVED***)
-***REMOVED***
+		}
+	})
+}
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -99,12 +101,12 @@ router.use(function(req, res, next) {
 	// res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 	// res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 	next();
-***REMOVED***);
+});
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
-	res.json({ message: 'uomsa events api' ***REMOVED***);	
-***REMOVED***);
+	res.json({ message: 'uomsa events api' });	
+});
 
 
 router.route('/event')
@@ -188,17 +190,26 @@ router.route('/registerDevice')
 // 				console.log(err)
 // 				if (err) return res.json(err);
 // 				return res.json(user);
-// 		***REMOVED***);
+// 			});
 
-// 	***REMOVED***)(req, res);
-// ***REMOVED***);
+// 		})(req, res);
+// 	});
 
 // router.route('/logout')
 // 	.get(function (req,res){
 // 		req.logout();
-// 		res.json({success:true***REMOVED***);
-// ***REMOVED***)
+// 		res.json({success:true});
+// 	})
 
+
+//redis heartbeat
+
+setInterval(function(){
+	redis.set("heartbeat", (new Date()).toString(), function(err){
+		if (err)console.log(err);
+		else console.log(".. Redis Ping");
+	});	
+}, 30000)
 
 
 // REGISTER OUR ROUTES -------------------------------

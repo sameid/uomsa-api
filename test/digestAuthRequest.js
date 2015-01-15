@@ -37,10 +37,10 @@ function digestAuthRequest(method, url, username, password) {
 
 		if (self.nonce == null) {
 			self.makeUnauthenticatedRequest(self.data);
-	***REMOVED*** else {
+		} else {
 			self.makeAuthenticatedRequest();
-	***REMOVED***		
-***REMOVED***
+		}		
+	}
 	this.makeUnauthenticatedRequest = function(data) {		
 		self.firstRequest = new XMLHttpRequest();
 		self.firstRequest.open(method, url, true);
@@ -61,8 +61,8 @@ function digestAuthRequest(method, url, username, password) {
 				for(var i = 0; i < responseHeaders.length; i++) {
 					if (responseHeaders[i].match(/www-authenticate/i) != null) {
 						digestHeaders = responseHeaders[i];
-				***REMOVED***
-			***REMOVED***
+					}
+				}
 				
 				if (digestHeaders != null) {
 					// parse auth header and get digest auth keys
@@ -76,28 +76,28 @@ function digestAuthRequest(method, url, username, password) {
 						// find realm
 						if (key.match(/realm/i) != null) {
 							self.realm = val;
-					***REMOVED***
+						}
 						// find nonce
 						if (key.match(/nonce/i) != null) {
 							self.nonce = val;
-					***REMOVED***
+						}
 						// find opaque
 						if (key.match(/opaque/i) != null) {
 							self.opaque = val;
-					***REMOVED***
+						}
 						// find QOP
 						if (key.match(/qop/i) != null) {
 							self.qop = val;
-					***REMOVED***
-				***REMOVED***
+						}
+					}
 					// client generated keys
 					self.cnonce = self.generateCnonce();
 					self.nc++;
 					// now we can make an authenticated request
 					
 					self.makeAuthenticatedRequest();
-			***REMOVED***
-		***REMOVED***
+				}
+			}
 			if (self.firstRequest.readyState == 4) {
 				if (self.firstRequest.status == 200) {
 					if (self.loggingOn) console.log('[digestAuthRequest] Authentication not required for '+url);
@@ -106,23 +106,23 @@ function digestAuthRequest(method, url, username, password) {
 							// If JSON, parse and return object
 							if (self.isJson(self.firstRequest.responseText)) {
 								self.successFn(JSON.parse(self.firstRequest.responseText));
-						***REMOVED*** else {
+							} else {
 								self.successFn(self.firstRequest.responseText);
-						***REMOVED***
-					***REMOVED***
-				***REMOVED*** else {
+							}
+						}
+					} else {
 						self.successFn();
-				***REMOVED***
-			***REMOVED***
-		***REMOVED***
-	***REMOVED***
+					}
+				}
+			}
+		}
 		// send
 		if (self.post) {
 			// in case digest auth not required
 			self.firstRequest.send(self.data);
-	***REMOVED*** else {
+		} else {
 			self.firstRequest.send();
-	***REMOVED***
+		}
 		if (self.loggingOn) console.log('[digestAuthRequest] Unauthenticated request to '+url);
 
 		// handle error
@@ -130,10 +130,10 @@ function digestAuthRequest(method, url, username, password) {
 			if (self.firstRequest.status !== 401) {
 				if (self.loggingOn) console.log('[digestAuthRequest] Error ('+self.authenticatedRequest.status+') on unauthenticated request to '+url);
 				self.errorFn(self.firstRequest.status);
-		***REMOVED***
-	***REMOVED***
+			}
+		}
 
-***REMOVED***
+	}
 	this.makeAuthenticatedRequest= function() {
 
 		self.response = self.formulateResponse();
@@ -167,34 +167,34 @@ function digestAuthRequest(method, url, username, password) {
 						// If JSON, parse and return object
 						if (self.isJson(self.authenticatedRequest.responseText)) {
 							self.successFn(JSON.parse(self.authenticatedRequest.responseText));
-					***REMOVED*** else {
+						} else {
 							self.successFn(self.authenticatedRequest.responseText);
-					***REMOVED***
-				***REMOVED***
-			***REMOVED*** else {
+						}
+					}
+				} else {
 					self.successFn();
-			***REMOVED***
-		***REMOVED***
+				}
+			}
 			// failure
 			else {
 				self.nonce = null;
 				self.errorFn(self.authenticatedRequest.status);
-		***REMOVED***
-	***REMOVED***
+			}
+		}
 		// handle errors
 		self.authenticatedRequest.onerror = function() { 
 			if (self.loggingOn) console.log('[digestAuthRequest] Error ('+self.authenticatedRequest.status+') on authenticated request to '+url);
 			self.nonce = null;
 			self.errorFn(self.authenticatedRequest.status);
-	***REMOVED***;
+		};
 		// send
 		if (self.post) {
 			self.authenticatedRequest.send(self.data);
-	***REMOVED*** else {
+		} else {
 			self.authenticatedRequest.send();
-	***REMOVED***
+		}
 		if (self.loggingOn) console.log('[digestAuthRequest] Authenticated request to '+url);
-***REMOVED***
+	}
 	// hash response based on server challenge
 	this.formulateResponse = function() {
 		var HA1 = CryptoJS.MD5(username+':'+self.realm+':'+password).toString();
@@ -206,7 +206,7 @@ function digestAuthRequest(method, url, username, password) {
 			self.qop+':'+
 			HA2).toString();
 		return response;
-***REMOVED***
+	}
 	// generate 16 char client nonce
 	this.generateCnonce = function() {
 		var characters = 'abcdef0123456789';
@@ -214,24 +214,24 @@ function digestAuthRequest(method, url, username, password) {
 		for (var i = 0; i < 16; i++) {
 			var randNum = Math.round(Math.random() * characters.length);
 			token += characters.substr(randNum, 1);
-	***REMOVED***
+		}
 		return token;
-***REMOVED***
+	}
 	this.abort = function() {
 		if (self.loggingOn) console.log('[digestAuthRequest] Aborted request to '+url);
 		if (self.firstRequest != null) {
 			if (self.firstRequest.readyState != 4) self.firstRequest.abort();
-	***REMOVED***
+		}
 		if (self.authenticatedRequest != null) {
 			if (self.authenticatedRequest.readyState != 4) self.authenticatedRequest.abort();
-	***REMOVED***
-***REMOVED***
+		}
+	}
 	this.isJson = function(str) {
 	    try {
 	        JSON.parse(str);
-	    ***REMOVED*** catch (e) {
+	    } catch (e) {
 	        return false;
-	    ***REMOVED***
+	    }
 	    return true;
-***REMOVED***
-***REMOVED***
+	}
+}

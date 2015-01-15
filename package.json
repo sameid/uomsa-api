@@ -5,10 +5,10 @@
 	"version": "0.0.1-12",
 	"engines": {
 		"node": "0.10.x"
-***REMOVED***
+	},
 	"scripts": {
 		"start": "node server.js"
-***REMOVED***
+	},
 	"dependencies": {
 		"async": "*",
 		"express": "~4.0.0",
@@ -29,5 +29,5 @@
 		"redis": "0.12.1",
 		"googlemaps": "0.1.20",
 		"node-uuid": "1.4.1"
-***REMOVED***
-***REMOVED***
+	}
+}

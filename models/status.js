@@ -10,12 +10,12 @@ var StatusSchema   = new Schema({
 	event_id: String,
 	user_id: String,
 	type: String
-***REMOVED***);
+});
 
 var StatusModel = mongoose.model('Status', StatusSchema);
 
 exports.createStatus = function(req, res){
-	StatusModel.remove({user_id:req.body.user_id, event_id:req.body.event_id***REMOVED***, function(err, statusInstance) {
+	StatusModel.remove({user_id:req.body.user_id, event_id:req.body.event_id}, function(err, statusInstance) {
 		if (err)res.send(err);
 		var statusInstance = new StatusModel();
 
@@ -29,10 +29,10 @@ exports.createStatus = function(req, res){
 
 			res.json({
 				message: 'Status Created Successfully'
-		***REMOVED***);
-	***REMOVED***);
-***REMOVED***);
-***REMOVED***
+			});
+		});
+	});
+}
 
 exports.readAllStatuses = function(req, res){
 
@@ -42,21 +42,21 @@ exports.readAllStatuses = function(req, res){
 		.exec(function(err, statuses){
 			if (err) res.send(err);
 			if (statuses) res.json(statuses);
-			else res.json({message: "not statuses"***REMOVED***);
-	***REMOVED***);
-***REMOVED***
+			else res.json({message: "not statuses"});
+		});
+}
 
 exports.readStatus = function(req, res) {
-	StatusModel.findOne({_id:req.params.status_id***REMOVED***, function(err, statusInstance) {
+	StatusModel.findOne({_id:req.params.status_id}, function(err, statusInstance) {
 		if (err)res.send(err);
 		if (statusInstance){
 			res.json(statusInstance);	
-	***REMOVED***
+		}
 		else{
 			res.json('status not found');
-	***REMOVED***
-***REMOVED***);
-***REMOVED***
+		}
+	});
+}
 
 exports.updateStatus = function(req, res) {
 	StatusModel.findById(req.params.status_id, function(err, statusInstance) {
@@ -65,43 +65,43 @@ exports.updateStatus = function(req, res) {
 			statusInstance.type = req.body.type;
 			statusInstance.save(function(err) {
 				if (err)res.send(err);
-				res.json({ message: 'status updated!' ***REMOVED***);
-		***REMOVED***);	
-	***REMOVED***
+				res.json({ message: 'status updated!' });
+			});	
+		}
 		else {
-			res.json({message:'status not found'***REMOVED***);
-	***REMOVED***
-***REMOVED***);
-***REMOVED***
+			res.json({message:'status not found'});
+		}
+	});
+}
 
 exports.deleteStatus = function(req, res) {
-	StatusModel.remove({_id: req.params.status_id***REMOVED***, function(err, statusInstance) {
+	StatusModel.remove({_id: req.params.status_id}, function(err, statusInstance) {
 		if (err)res.send(err);
-		if (statusInstance) res.json({ message: 'Successfully deleted status' ***REMOVED***);
-		else res.json({message:'status not found'***REMOVED***);
-***REMOVED***);
-***REMOVED***
+		if (statusInstance) res.json({ message: 'Successfully deleted status' });
+		else res.json({message:'status not found'});
+	});
+}
 
 exports.findStatusByEventAndUser = function (req, res){
-	StatusModel.findOne({user_id:req.params.user_id, event_id:req.params.event_id***REMOVED***, function(err, statusInstance) {
+	StatusModel.findOne({user_id:req.params.user_id, event_id:req.params.event_id}, function(err, statusInstance) {
 		if (err)res.send(err);
 		if (statusInstance){
 			res.json(statusInstance);	
-	***REMOVED***
+		}
 		else{
 			res.json(null);
-	***REMOVED***
-***REMOVED***);
+		}
+	});
 
-***REMOVED***
+}
 exports.deleteStatusByEventAndUser = function (req, res){
-	StatusModel.remove({user_id:req.params.user_id, event_id:req.params.event_id***REMOVED***, function(err, statusInstance) {
+	StatusModel.remove({user_id:req.params.user_id, event_id:req.params.event_id}, function(err, statusInstance) {
 		if (err)res.send(err);
-		if (statusInstance) res.json({ message: 'Successfully deleted status' ***REMOVED***);
-		else res.json({message:'status not found'***REMOVED***);
-***REMOVED***);
+		if (statusInstance) res.json({ message: 'Successfully deleted status' });
+		else res.json({message:'status not found'});
+	});
 
-***REMOVED***
+}
 
 exports.attending = function(req, res){
 	var user_id = req.params.user_id
@@ -115,17 +115,17 @@ exports.attending = function(req, res){
 
 				async.map(statuses, function(item, callback){
 					callback(null, item.event_id)
-			***REMOVED*** function (err, results){
+				}, function (err, results){
 					EventModel
 						.find()
 						.where('_id').in(results)
 						.select("_id title")
 						.exec(function(err, events){
 							res.json(events);
-					***REMOVED***);
-			***REMOVED***);
+						});
+				});
 
-		***REMOVED***
-			else res.json({message: "not statuses"***REMOVED***);
-	***REMOVED***);
-***REMOVED***
+			}
+			else res.json({message: "not statuses"});
+		});
+}
